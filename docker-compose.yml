@@ -1,18 +1,19 @@
-version: '3.9'
 services:
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
     ports:
-      - "5000:5000"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - "5000:80"
     volumes:
       - ./backend:/app
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
 
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "4200:80"
     depends_on:
