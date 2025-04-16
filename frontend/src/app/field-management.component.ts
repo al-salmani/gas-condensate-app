@@ -47,10 +47,10 @@ export class FieldManagementComponent implements OnInit {
   fields: any[] = [];
   userRole: string = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.userRole = this.AuthService.getRole();
+    this.userRole = this.authService.getRole();
     this.loadFields();
   }
 
