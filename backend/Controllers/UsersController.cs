@@ -8,6 +8,16 @@ using WebApiDemo;
 [Authorize(Roles = "Admin")]
 public class UsersController : ControllerBase
 {
+    public class CreateUserModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string Role { get; set; } = "Operator";
+    }
+
+    public class RoleUpdateModel { public string Role { get; set; } = ""; }
+    public class PasswordUpdateModel { public string Password { get; set; } = ""; }
+
     private readonly AppDbContext _context;
 
     public UsersController(AppDbContext context)
@@ -20,6 +30,25 @@ public class UsersController : ControllerBase
     {
         var users = await _context.Users.Select(u => new { u.Id, u.Username, u.Role }).ToListAsync();
         return Ok(users);
+    }
+
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserModel model)
+    {
+        if (await _context.Users.AnyAsync(u => u.Username == model.Username))
+            return BadRequest("اسم المستخدم موجود بالفعل");
+
+        var user = new User
+        {
+            Username = model.Username,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+            Role = model.Role
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetAll), new { id = user.Id }, new { user.Id, user.Username, user.Role });
     }
 
     [HttpDelete("{id}")]
@@ -51,7 +80,4 @@ public class UsersController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
-
-    public class RoleUpdateModel { public string Role { get; set; } = ""; }
-    public class PasswordUpdateModel { public string Password { get; set; } = ""; }
 }

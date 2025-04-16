@@ -1,33 +1,42 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-login',
   template: `
-  <h2>Login</h2>
-  <form [formGroup]="form" (ngSubmit)="login()">
-    <input formControlName="username" placeholder="Username" />
-    <input formControlName="password" placeholder="Password" type="password" />
-    <button type="submit">Login</button>
-  </form>
+    <h2>تسجيل الدخول</h2>
+    <form (submit)="login()">
+      <label>اسم المستخدم: <input [(ngModel)]="username" name="username"></label><br>
+      <label>كلمة المرور: <input type="password" [(ngModel)]="password" name="password"></label><br>
+      <button type="submit">دخول</button>
+    </form>
+    <p *ngIf="error" style="color:red;">فشل تسجيل الدخول</p>
   `
 })
 export class LoginComponent {
-  form: FormGroup;
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
-    this.form = this.fb.group({ username: '', password: '' });
-  }
+  username = '';
+  password = '';
+  error = false;
 
-  login() {
-    const { username, password } = this.form.value;
-    this.auth.login(username, password).subscribe({
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  login(): void {
+    this.http.post<any>('http://localhost:5000/api/auth/login', {
+      username: this.username,
+      passwordHash: this.password
+    }).subscribe({
       next: (res) => {
-        this.auth.saveToken(res.token);
+        // تأكد أن الـ backend يرجع username ضمن الاستجابة
+		this.authService.login(res.token, res.username, res.role);
         this.router.navigate(['/dashboard']);
       },
-      error: () => alert('Login failed')
+      error: () => this.error = true
     });
   }
 }

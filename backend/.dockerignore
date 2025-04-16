@@ -1,0 +1,6 @@
+bin/
+obj/
+*.runtimeconfig.json
+*.deps.json
+*.user
+*.vs

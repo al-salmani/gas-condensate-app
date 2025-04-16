@@ -17,7 +17,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.json",
             "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.scss"],
+            "styles": ["src/styles.scss","node_modules/leaflet/dist/leaflet.css"],
             "scripts": []
           }
         },

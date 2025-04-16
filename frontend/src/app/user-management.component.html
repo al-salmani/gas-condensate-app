@@ -1,0 +1,50 @@
+<div class="container">
+  <h2>إدارة المستخدمين</h2>
+  
+  <div style="margin-top: 1rem;">
+  <button (click)="exportToExcel()">📥 تصدير Excel</button>
+  <button (click)="exportToPDF()">📄 تصدير PDF</button>
+</div>
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>الاسم</th>
+        <th>الصلاحية</th>
+        <th>تغيير الصلاحية</th>
+        <th>كلمة المرور</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.username }}</td>
+        <td>{{ user.role }}</td>
+        <td>
+          <select [(ngModel)]="user.role" (change)="changeRole(user)">
+            <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+          </select>
+        </td>
+        <td>
+          <button (click)="changePassword(user)">تغيير</button>
+        </td>
+        <td>
+          <button (click)="deleteUser(user)">حذف</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+	  <h3>إضافة مستخدم جديد</h3>
+	<form (ngSubmit)="addUser()">
+	  <input [(ngModel)]="newUser.username" name="username" placeholder="اسم المستخدم" required>
+	  <input [(ngModel)]="newUser.password" name="password" type="password" placeholder="كلمة المرور" required>
+	  <select [(ngModel)]="newUser.role" name="role">
+		<option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+	  </select>
+	  <button type="submit">إضافة</button>
+	</form>
+	<hr>
+
+</div>

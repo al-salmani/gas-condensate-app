@@ -1,32 +1,55 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  constructor(private http: HttpClient, private router: Router) {}
+  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
 
-  login(username: string, password: string) {
-    return this.http.post<any>('http://localhost:5000/api/auth/login', {
-      username,
-      passwordHash: password
-    });
+  // Observable للربط مع المكونات
+  get isLoggedIn$() {
+    return this.loggedIn.asObservable();
   }
 
-  saveToken(token: string) {
-    localStorage.setItem('token', token);
-  }
-
-  getToken() {
-    return localStorage.getItem('token');
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/login']);
-  }
-
-  isLoggedIn(): boolean {
+  // فحص وجود التوكن
+  private hasToken(): boolean {
     return !!localStorage.getItem('token');
+  }
+
+  // تنفيذ عند تسجيل الدخول
+  login(token: string, username: string, role: string) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('username', username);
+    localStorage.setItem('role', role);
+    this.loggedIn.next(true);
+  }
+
+  // تنفيذ عند تسجيل الخروج
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
+    this.loggedIn.next(false);
+  }
+
+  // جلب اسم المستخدم المسجل
+  getUsername(): string | null {
+    return localStorage.getItem('username');
+  }
+  
+    // جلب صلاحيات المستخدم المسجل
+  getRole(): string | null {
+    return localStorage.getItem('role');
+  }
+
+  // دعم لمن يستخدم دالة مباشرة دون الـ observable
+  isLoggedIn(): boolean {
+    return this.hasToken();
+  }
+
+  // جلب التوكن
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
 }

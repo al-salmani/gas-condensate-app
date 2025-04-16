@@ -14,23 +14,24 @@ public class AuthController : ControllerBase
         _tokenService = tokenService;
     }
 
-    [HttpPost("register")]
-    public IActionResult Register(User user)
-    {
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
-        _context.Users.Add(user);
-        _context.SaveChanges();
-        return Ok();
-    }
-
     [HttpPost("login")]
-    public IActionResult Login(User user)
+    public IActionResult Login([FromBody] LoginModel model)
     {
-        var existing = _context.Users.FirstOrDefault(x => x.Username == user.Username);
-        if (existing == null || !BCrypt.Net.BCrypt.Verify(user.PasswordHash, existing.PasswordHash))
+        var existing = _context.Users.FirstOrDefault(x => x.Username == model.Username);
+        if (existing == null || !BCrypt.Net.BCrypt.Verify(model.Password, existing.PasswordHash))
             return Unauthorized();
 
         var token = _tokenService.CreateToken(existing);
-        return Ok(new { token });
+        return Ok(new { 
+		token,
+        username = existing.Username,
+        role = existing.Role
+		});
     }
+}
+
+public class LoginModel
+{
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }

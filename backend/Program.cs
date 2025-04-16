@@ -1,52 +1,92 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using WebApiDemo;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddDbContext<AppDbContext>();
-builder.Services.AddScoped<TokenService>();
-
-// ✅ CORS configuration
+// 1. إعداد سياسة CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowAngularApp", builder =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        builder.WithOrigins("http://localhost:4200", "http://frontend:80")
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
     });
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = "MARA",
-            ValidAudience = "MARA",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("supersecurekey123"))
-        };
-    });
-
-builder.Services.AddAuthorization();
-
 var app = builder.Build();
+
+// 🔁 Middleware يدوي (اختياري - يمكن حذفه بعد التأكد من عمل CORS)
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:4200");
+        context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+        context.Response.StatusCode = 204;
+        return;
+    }
+
+    await next();
+});
+
+// ✅ الترتيب السليم لميدل وير CORS
+app.UseRouting();
+
+app.UseCors("AllowAngularApp"); // ✅ بعد UseRouting وقبل MapControllers
+
+// app.UseAuthentication(); // إن وجدت
+// app.UseAuthorization();  // إن وجدت
+
+app.MapControllers();
+app.Run();
+
+
+// 2. إضافة الخدمات الأخرى مثل Controllers و Authentication وغيرها
+builder.Services.AddControllers();
+// مثال: builder.Services.AddAuthentication(...);
+// مثال: builder.Services.AddAuthorization();
+
+
+// Middleware يدوي مؤقت لحل المشكلة
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:4200");
+        context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+        context.Response.StatusCode = 204;
+        return;
+    }
+
+    await next();
+});
+// 3. تفعيل البيئة التطويرية
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+// 4. ترتيب الـ Middleware بشكل صحيح
+
+// تفعيل CORS قبل أي شيء يستخدم الطلبات
+app.UseCors("AllowAngularApp");
+
+// إذا كنت تستخدم المصادقة
+// app.UseAuthentication();
+
+// إذا كنت تستخدم التفويض
+// app.UseAuthorization();
 
 app.UseRouting();
 
-// ✅ ⚠️ ضع CORS هنا
-app.UseCors("AllowAll");
-
-app.UseAuthentication();
-app.UseAuthorization();
-
+// تفعيل الـ Controllers
 app.MapControllers();
 
 app.Run();
