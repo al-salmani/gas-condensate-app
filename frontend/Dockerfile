@@ -21,6 +21,7 @@ FROM nginx:alpine
 
 # نسخ ملفات Angular النهائية إلى مجلد nginx
 COPY --from=build /app/dist/gas-condensate-app /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # فتح المنفذ 4200
 EXPOSE 4200

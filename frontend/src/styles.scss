@@ -1,4 +1,9 @@
 body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  direction: rtl;
+  text-align: right;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+table, input, select, button {
+  direction: rtl;
+  text-align: right;
 }

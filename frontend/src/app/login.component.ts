@@ -27,7 +27,7 @@ export class LoginComponent {
   ) {}
 
   login(): void {
-    this.http.post<any>('http://localhost:5000/api/auth/login', {
+    this.http.post<any>('/api/auth/login', {
       username: this.username,
       passwordHash: this.password
     }).subscribe({

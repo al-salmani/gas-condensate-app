@@ -1,0 +1,3 @@
+@echo off
+echo فتح Microsoft Edge بدون قيود CORS لأغراض التطوير...
+start msedge --disable-web-security --user-data-dir="C:\Temp\edge-cors"

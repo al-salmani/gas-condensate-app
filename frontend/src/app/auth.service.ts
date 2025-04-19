@@ -25,6 +25,7 @@ export class AuthService {
     this.loggedIn.next(true);
   }
 
+  
   // تنفيذ عند تسجيل الخروج
   logout(): void {
     localStorage.removeItem('token');
@@ -35,13 +36,24 @@ export class AuthService {
 
   // جلب اسم المستخدم المسجل
   getUsername(): string | null {
-    return localStorage.getItem('username');
+    const token = localStorage.getItem('token');
+    if (!token) return '';
+  
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload['name'] || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
+
   }
   
     // جلب صلاحيات المستخدم المسجل
   getRole(): string | null {
-    return localStorage.getItem('role');
-  }
+
+    const token = localStorage.getItem('token');
+    if (!token) return '';
+  
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload['role'] || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+  
+ }
 
   // دعم لمن يستخدم دالة مباشرة دون الـ observable
   isLoggedIn(): boolean {
@@ -51,5 +63,6 @@ export class AuthService {
   // جلب التوكن
   getToken(): string | null {
     return localStorage.getItem('token');
+    
   }
 }
