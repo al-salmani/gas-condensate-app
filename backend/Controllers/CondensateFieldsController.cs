@@ -30,7 +30,7 @@ public class CondensateFieldsController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Create([FromBody] CondensateField field)
+    public async Task<IActionResult> addField([FromBody] CondensateField field)
     {
         _context.CondensateFields.Add(field);
         await _context.SaveChangesAsync();
@@ -39,7 +39,7 @@ public class CondensateFieldsController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin,Operator,Engineer")]
-    public async Task<IActionResult> Update(int id, [FromBody] CondensateField updated)
+    public async Task<IActionResult> updateField(int id, [FromBody] CondensateField updated)
     {
         var existing = await _context.CondensateFields.FindAsync(id);
         if (existing == null) return NotFound();
@@ -66,7 +66,7 @@ public class CondensateFieldsController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> deleteField(int id)
     {
         var field = await _context.CondensateFields.FindAsync(id);
         if (field == null) return NotFound();

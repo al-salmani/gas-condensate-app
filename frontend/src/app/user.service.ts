@@ -27,6 +27,6 @@ export class UserService {
   }
 
   addUser(username: string, password: string, role: string): Observable<any> {
-	  return this.http.post(`${this.apiUrl}/create`, { username, password, role });
+	  return this.http.post(`${this.apiUrl}`, { username, password, role });
   }
 }

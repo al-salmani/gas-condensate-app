@@ -32,8 +32,8 @@ public class UsersController : ControllerBase
         return Ok(users);
     }
 
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateUser([FromBody] CreateUserModel model)
+    [HttpPost]
+    public async Task<IActionResult> addUser([FromBody] CreateUserModel model)
     {
         if (await _context.Users.AnyAsync(u => u.Username == model.Username))
             return BadRequest("اسم المستخدم موجود بالفعل");

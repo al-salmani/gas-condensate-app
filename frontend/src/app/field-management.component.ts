@@ -43,6 +43,20 @@ import { AuthService } from './auth.service';
         </tr>
       </tbody>
     </table>
+    <div *ngIf="isAdmin" class="add-field-form">
+  <h3>➕ إضافة حقل جديد</h3>
+  <form (ngSubmit)="addField()">
+    <input [(ngModel)]="newField.fieldName" name="name" placeholder="اسم الحقل" required />
+    <input [(ngModel)]="newField.latitude" name="lat" placeholder="Latitude" required type="number" />
+    <input [(ngModel)]="newField.longitude" name="lng" placeholder="Longitude" required type="number" />
+    <input [(ngModel)]="newField.productionRate" name="prod" placeholder="الإنتاج" required type="number" />
+    <input [(ngModel)]="newField.cost" name="cost" placeholder="التكلفة" required />
+    <input [(ngModel)]="newField.yearOfExtraction" name="year" placeholder="سنة الاستخراج" required />
+    <input [(ngModel)]="newField.maintenanceType" name="maint" placeholder="نوع الصيانة" required />
+    <button type="submit">إضافة</button>
+  </form>
+</div>
+
   `
 })
 export class FieldManagementComponent implements OnInit {
@@ -59,6 +73,7 @@ export class FieldManagementComponent implements OnInit {
     this.userRole = this.authService.getRole();
     this.loadFields();
     console.log('🧪 التوكن', this.userToken);
+    console.log('🧪 التوكن المجزأ', JSON.parse(atob(localStorage.getItem('token').split('.')[1])));
     console.log('🧪 اسم المستخدم', this.userName);
     console.log('🧪  الصلاحية:', this.userRole);
 
@@ -80,6 +95,33 @@ export class FieldManagementComponent implements OnInit {
     this.http.get<any[]>('/api/condensatefields')
       .subscribe(data => this.fields = data);
   }
+
+  newField = {
+    fieldName: '',
+    latitude: '',
+    longitude: '',
+    productionRate: '',
+    cost: '',
+    yearOfExtraction: '',
+    maintenanceType: ''
+  };
+  
+  addField(): void {
+    this.http.post('/api/condensatefields', this.newField)
+      .subscribe(() => {
+        this.loadFields();  // إعادة تحميل البيانات
+        this.newField = {  // إعادة ضبط النموذج
+          fieldName: '',
+          latitude: '',
+          longitude: '',
+          productionRate: '',
+          cost: '',
+          yearOfExtraction: '',
+          maintenanceType: ''
+        };
+      });
+  }
+
 
   updateField(field: any): void {
     this.http.put('/api/condensatefields/' + field.id, field)

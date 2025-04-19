@@ -23,9 +23,7 @@ public class AuthController : ControllerBase
 
         var token = _tokenService.CreateToken(existing);
         return Ok(new { 
-		token,
-        username = existing.Username,
-        role = existing.Role
+		token
 		});
     }
 }

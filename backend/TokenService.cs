@@ -15,15 +15,18 @@ namespace WebApiDemo
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim("username", user.Username),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("role", user.Role)  // ← هذا يجعل ASP.NET Core يتعرف على [Authorize(Roles = "...")]
+
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "supersecurekey123"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"] ?? "MARA",
-                audience: _config["Jwt:Audience"] ?? "MARA",
+                issuer: _config["Jwt:Issuer"] ?? "FAISAL",
+                audience: _config["Jwt:Audience"] ?? "PDO",
                 claims: claims,
                 expires: DateTime.Now.AddHours(1),
                 signingCredentials: creds);
