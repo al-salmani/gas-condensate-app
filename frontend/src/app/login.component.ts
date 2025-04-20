@@ -33,7 +33,7 @@ export class LoginComponent {
     }).subscribe({
       next: (res) => {
         // تأكد أن الـ backend يرجع username ضمن الاستجابة
-		this.authService.login(res.token, res.username, res.role);
+		this.authService.login(res.token);     
         this.router.navigate(['/dashboard']);
       },
       error: () => this.error = true

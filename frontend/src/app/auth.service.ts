@@ -18,10 +18,11 @@ export class AuthService {
   }
 
   // تنفيذ عند تسجيل الدخول
-  login(token: string, username: string, role: string) {
+  login(token: string) {
     localStorage.setItem('token', token);
-    localStorage.setItem('username', username);
-    localStorage.setItem('role', role);
+    const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+    localStorage.setItem('role', tokenPayload['role'] || tokenPayload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+    localStorage.setItem('username', tokenPayload['name'] || tokenPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']);
     this.loggedIn.next(true);
   }
 
@@ -34,26 +35,7 @@ export class AuthService {
     this.loggedIn.next(false);
   }
 
-  // جلب اسم المستخدم المسجل
-  getUsername(): string | null {
-    const token = localStorage.getItem('token');
-    if (!token) return '';
   
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload['name'] || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
-
-  }
-  
-    // جلب صلاحيات المستخدم المسجل
-  getRole(): string | null {
-
-    const token = localStorage.getItem('token');
-    if (!token) return '';
-  
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload['role'] || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-  
- }
 
   // دعم لمن يستخدم دالة مباشرة دون الـ observable
   isLoggedIn(): boolean {

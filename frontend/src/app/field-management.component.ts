@@ -69,8 +69,8 @@ export class FieldManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.userToken = this.authService.getToken();
-    this.userName = this.authService.getUsername();
-    this.userRole = this.authService.getRole();
+    this.userName = localStorage.getItem('name');
+    this.userRole = localStorage.getItem('role');
     this.loadFields();
     console.log('🧪 التوكن', this.userToken);
     console.log('🧪 التوكن المجزأ', JSON.parse(atob(localStorage.getItem('token').split('.')[1])));

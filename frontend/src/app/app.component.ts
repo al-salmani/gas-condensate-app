@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
   }
 
   getUsername(): string | null {
-    return this.authService.getUsername();
+    return localStorage.getItem('username');
   }
 
   logout(): void {

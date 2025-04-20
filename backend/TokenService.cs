@@ -21,17 +21,27 @@ namespace WebApiDemo
 
             };
 
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "supersecurekey123"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+
+
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"] ?? "FAISAL",
-                audience: _config["Jwt:Audience"] ?? "PDO",
+                audience: _config["Jwt:Audience"] ?? "FAISAL",
                 claims: claims,
                 expires: DateTime.Now.AddHours(1),
                 signingCredentials: creds);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            //return new JwtSecurityTokenHandler().WriteToken(token);
+        
+                    // طباعة التوكن
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            Console.WriteLine("Generated Token: " + tokenString);
+
+            return tokenString;
+        
         }
     }
 }
